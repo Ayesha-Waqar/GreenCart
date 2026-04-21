@@ -35,23 +35,35 @@ const updateCart = async (req, res) => {
 
 const getCart = async (req, res) => {
   try {
-    // Middleware se aane wali userId (req.body.userId ya req.userId)
+    // 1. Extract userId (Ensure your auth middleware sets this correctly)
     const userId = req.userId; 
-
-    // Cart collection ke bajaye User collection mein dhoondna hai
-    const userData = await user.findById(userId);
-
+// console.log(userId)
+    // 2. Fetch only the cartItems field to improve performance (.select)
+    const userData = await user.findById(userId).select("cartItems");
+// console.log(userData)
+    // 3. Check if user exists
     if (!userData) {
-      return res.status(404).json({ success: false, message: "User nahi mila" });
+      return res.status(404).json({ 
+        success: false, 
+        message: "User not found" 
+      });
     }
 
-    // Database mein field ka naam 'cartItems' hai jaisa image mein dikh raha hai
+    // 4. Extract cartItems (Default to empty object if undefined)
     const cartData = userData.cartItems || {};
 
-    res.status(200).json({ success: true, cartData });
+    // 5. Send successful response
+    res.status(200).json({ 
+      success: true, 
+      cartData 
+    });
+
   } catch (error) {
-    console.log(error);
-    res.status(500).json({ success: false, message: error.message });
+    console.error("Error in getCart:", error);
+    res.status(500).json({ 
+      success: false, 
+      message: "Server Error: " + error.message 
+    });
   }
 };
 module.exports = { updateCart  , getCart }

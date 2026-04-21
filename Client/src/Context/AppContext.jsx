@@ -128,7 +128,6 @@ export const AppContextProvider = ({ children }) => {
     return Math.floor(totalAmount * 100) / 100;
   };
 
- 
   useEffect(() => {
     fetchSeller();
     fetchProducts();
@@ -160,6 +159,26 @@ export const AppContextProvider = ({ children }) => {
     updateCart();
   }, [cartItems, user]);
 
+useEffect(() => {
+  const getCartItems = async () => {
+    try {
+      const { data } = await axios.get("http://localhost:3000/api/cart/get");
+
+      console.log("get cart ", data);
+
+      if (data.success) {
+        setCartItems(data.cartItems || {}); 
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message || error.message);
+    }
+  };
+
+  getCartItems(); 
+}, []);
+
   const value = {
     navigate,
     user,
@@ -189,5 +208,3 @@ export const AppContextProvider = ({ children }) => {
 export const useAppContext = () => {
   return useContext(appContext);
 };
-
-
