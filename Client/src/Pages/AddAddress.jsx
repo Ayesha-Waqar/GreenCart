@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+ import React, { useEffect, useState } from 'react';
 import { assets } from '../assets/assets';
 import { useAppContext } from '../Context/AppContext';
-
+import toast from 'react-hot-toast';
 // Reusable Input Component
 const InputField = ({ type, name, placeholder, onChange, address }) => (
   <input
@@ -16,7 +16,7 @@ const InputField = ({ type, name, placeholder, onChange, address }) => (
 );
 
 const AddAddress = () => {
-  const { navigate } = useAppContext();
+  const { navigate ,axios  ,user} = useAppContext();
 
   // State initialized from your image
   const [address, setAddress] = useState({
@@ -38,10 +38,32 @@ const AddAddress = () => {
 
   const formSubmitHandler = async (e) => {
     e.preventDefault();
-    console.log("Saving Address:", address);
-    // Add your API call or context update logic here
-    navigate('/cart');
+    try {
+      const { data } = await axios.post(
+        "http://localhost:3000/api/address/add",
+        { address }
+      );
+      console.log(data)
+      if (data.success) {
+        toast.success(data.message);
+        navigate('/cart')
+      }
+      else{
+        toast.error(data.message);
+      }
+
+    } catch (error) {
+      toast.error(error.response?.data?.message || error.message);
+    }
+   
   };
+
+  useEffect(()=>{
+    if(!user){
+      console.log(" address page : user not logged in ")
+navigate('/cart')
+    }
+  },[])
 
   return (
     <div className="flex flex-col md:flex-row items-start justify-center py-16 px-6 max-w-6xl mx-auto gap-12">

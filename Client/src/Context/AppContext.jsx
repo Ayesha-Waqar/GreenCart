@@ -19,6 +19,7 @@ export const AppContextProvider = ({ children }) => {
   const [products, setProducts] = useState([]);
   const [cartItems, setCartItems] = useState({});
   const [searchQuery, setSearchQuery] = useState({});
+  const [isCartLoaded, setIsCartLoaded] = useState(false);
 
   const fetchSeller = async () => {
     try {
@@ -39,26 +40,50 @@ export const AppContextProvider = ({ children }) => {
     }
   };
 
+  // const fetchUser = async () => {
+  //   try {
+  //     const { data } = await axios.get(
+  //       "http://localhost:3000/api/user/isAuth",
+  //       { withCredentials: true },
+  //     );
+  //     console.log(data);
+  //     if (data.success) {
+  //       toast.dismiss();
+  //       toast.success(data.message);
+  //       setUser(data.user);
+  //       setCartItems(data.user.cartItems || {});
+  //     } else {
+  //       console.log("error in data ");
+  //       setUser(null);
+  //     }
+  //   } catch (error) {
+  //     toast.error(error.message);
+  //   }
+  // };
+ 
+ 
   const fetchUser = async () => {
-    try {
-      const { data } = await axios.get(
-        "http://localhost:3000/api/user/isAuth",
-        { withCredentials: true },
-      );
-      console.log(data);
-      if (data.success) {
-        toast.dismiss();
-        toast.success(data.message);
-        setUser(data.user);
-        setCartItems(data.user.cartItems || {});
-      } else {
-        console.log("error in data ");
-        setUser(null);
-      }
-    } catch (error) {
-      toast.error(error.message);
+  try {
+    const { data } = await axios.get(
+      "http://localhost:3000/api/user/isAuth",
+      { withCredentials: true }
+    );
+    console.log("fetch userrrrr" , data)
+    if (data.success) {
+      setUser(data.user);
+            console.log(data.user)
+      setCartItems(data.user.cartItems || {}); // DB se cart load
+               console.log(cartItems)
+      setIsCartLoaded(true); // flag set karo
+    } else {
+      setUser(null);
+      setIsCartLoaded(true); // guest ke liye bhi set karo
     }
-  };
+  } catch (error) {
+    toast.error(error.message);
+    setIsCartLoaded(true); // error pe bhi set karo..warna save kabhi nahi hoga
+  }
+};
 
   const fetchProducts = async () => {
     try {
@@ -136,39 +161,16 @@ export const AppContextProvider = ({ children }) => {
 
   // update cart items in db
   useEffect(() => {
-    if (!user) return;
+  if (!user) return;           // skip guest
+  if (!isCartLoaded) return;   //Wa8 to complete fetch
 
-    const updateCart = async () => {
-      try {
-        const { data } = await axios.post(
-          "http://localhost:3000/api/cart/update",
-          { cartItems },
-        );
-
-        console.log(data);
-
-        if (data.success) {
-          toast.success(data.message);
-        } else {
-          toast.error(data.message);
-        }
-      } catch (error) {
-        toast.error(error.response?.data?.message || error.message);
-      }
-    };
-    updateCart();
-  }, [cartItems, user]);
-
-useEffect(() => {
-  const getCartItems = async () => {
+  const updateCart = async () => {
     try {
-      const { data } = await axios.get("http://localhost:3000/api/cart/get");
-
-      console.log("get cart ", data);
-
-      if (data.success) {
-        setCartItems(data.cartItems || {}); 
-      } else {
+      const { data } = await axios.post(
+        "http://localhost:3000/api/cart/update",
+        { cartItems }
+      );
+      if (!data.success) {
         toast.error(data.message);
       }
     } catch (error) {
@@ -176,8 +178,28 @@ useEffect(() => {
     }
   };
 
-  getCartItems(); 
-}, []);
+  updateCart();
+}, [cartItems, isCartLoaded]); 
+
+// useEffect(() => {
+//   const getCartItems = async () => {
+//     try {
+//       const { data } = await axios.get("http://localhost:3000/api/cart/get");
+
+//       console.log("get cart ", data);
+
+//       if (data.success) {
+//         setCartItems(data.cartItems || {}); 
+//       } else {
+//         toast.error(data.message);
+//       }
+//     } catch (error) {
+//       toast.error(error.response?.data?.message || error.message);
+//     }
+//   };
+
+//   getCartItems(); 
+// }, []);
 
   const value = {
     navigate,
@@ -186,7 +208,7 @@ useEffect(() => {
     isSeller,
     setIsSeller,
     showLogin,
-    setShowLogin,
+    setShowLogin ,
     products,
     currency,
     cartItems,
@@ -200,6 +222,7 @@ useEffect(() => {
     axios,
     fetchProducts,
     fetchUser,
+    setCartItems
   };
 
   return <appContext.Provider value={value}>{children}</appContext.Provider>;

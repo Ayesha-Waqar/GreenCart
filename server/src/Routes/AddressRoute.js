@@ -5,7 +5,7 @@ const { addAddress, getAddress } = require("../Controllers/AddressController");
 const addressRouter= express.Router();
 
 addressRouter.post('/add' , authUser , addAddress)
-addressRouter.get('/add' , authUser , getAddress)
+addressRouter.get('/get' , authUser , getAddress)
 
 
 module.exports=addressRouter  

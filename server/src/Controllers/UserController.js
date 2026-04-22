@@ -141,6 +141,7 @@ const isAuth = async (req, res) => {
       user: {
         name: foundUser.name,
         email: foundUser.email,
+        cartItems : foundUser.cartItems
       },
     });
 

@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useAppContext } from "../Context/AppContext";
-import { assets, dummyAddress } from "../assets/assets";
+import { assets } from "../assets/assets";
+import toast from "react-hot-toast";
+
 
 const Cart = () => {
   const {
@@ -12,12 +14,15 @@ const Cart = () => {
     RemoveFromCart,
     getCartAmount,
     totalCardItems,
+    axios,
+    user,
+    setCartItems
   } = useAppContext();
 
   const [showAddress, setShowAddress] = useState(false);
   const [cartArray, setCartArray] = useState([]);
-  const [Addresses, setAddresses] = useState(dummyAddress);
-  const [selectedAddress, setSelectedAddress] = useState(dummyAddress[0]);
+  const [Addresses, setAddresses] = useState({});
+  const [selectedAddress, setSelectedAddress] = useState(null);
   const [paymentOption, setPaymentOption] = useState("COD");
 
   const getCart = () => {
@@ -31,8 +36,63 @@ const Cart = () => {
     setCartArray(tempArr);
   };
 
+  //fetch user address
+  const getAddress = async () => {
+    try {
+      const { data } = await axios.get("http://localhost:3000/api/address/get");
+      // console.log("fetch address", data);
+      if (data.success) {
+        setAddresses(data.address);
+        // console.log(data.address);
+        if (data.address.length > 0) {
+          setSelectedAddress(data.address[0]);
+        }
+      } else {
+        setUser(null);
+        setIsCartLoaded(true); // guest ke liye bhi set karo
+      }
+    } catch (error) {
+      toast.error(error.message);
+      setIsCartLoaded(true); // error pe bhi set karo..warna save kabhi nahi hoga
+    }
+  };
+
+  useEffect(() => {
+    if (user) {
+      getAddress();
+    }
+  }, [user]);
+
   const placeOrder = async () => {
-    // Order placement logic
+    try {
+      if (!selectedAddress) {
+        return toast.error("No address found");
+      }
+
+      //Place order with COd
+      if (paymentOption === "COD") {
+        const { data } = await axios.post(
+          "http://localhost:3000/api/order/cod",
+          {
+            // userId: user._id,
+            items: cartArray.map((item) => ({
+              product: item._id,
+              quantity: item.quantity,
+            })),
+            address: selectedAddress._id,
+          },
+        );
+        if (data.success) {
+          toast.success(data.message)
+          setCartItems({})
+          navigate('/Orders')
+        } else {
+          toast.error(data.message);
+        }
+      }
+    } catch (error) {
+      toast.error(error.message);
+    }
   };
 
   useEffect(() => {
@@ -44,9 +104,7 @@ const Cart = () => {
       <div className="flex-1 max-w-4xl">
         <h1 className="text-3xl font-medium mb-6">
           Shopping Cart{" "}
-          <span className="text-sm text-primary">
-            {totalCardItems()} Items
-          </span>
+          <span className="text-sm text-primary">{totalCardItems()} Items</span>
         </h1>
 
         <div className="grid grid-cols-[2fr_1fr_1fr] text-gray-500 text-base font-medium pb-3">
@@ -63,12 +121,18 @@ const Cart = () => {
             <div className="flex items-center md:gap-6 gap-3">
               <div
                 onClick={() => {
-                  navigate(`/products/${product.category.toLowerCase()}/${product._id}`);
+                  navigate(
+                    `/products/${product.category.toLowerCase()}/${product._id}`,
+                  );
                   window.scrollTo(0, 0);
                 }}
                 className="cursor-pointer w-24 h-24 flex items-center justify-center border border-gray-300 rounded overflow-hidden"
               >
-                <img className="max-w-full h-full object-cover" src={product.image[0]} alt={product.name} />
+                <img
+                  className="max-w-full h-full object-cover"
+                  src={product.image[0]}
+                  alt={product.name}
+                />
               </div>
               <div>
                 <p className="hidden md:block font-semibold">{product.name}</p>
@@ -77,29 +141,51 @@ const Cart = () => {
                     <p>Qty: </p>
                     <select
                       value={product.quantity}
-                      onChange={(e) => UpdateCartItems(product._id, Number(e.target.value))}
+                      onChange={(e) =>
+                        UpdateCartItems(product._id, Number(e.target.value))
+                      }
                       className="outline-none ml-2 bg-transparent"
                     >
                       {Array.from(
-                        { length: cartItems[product._id] > 9 ? cartItems[product._id] : 9 },
+                        {
+                          length:
+                            cartItems[product._id] > 9
+                              ? cartItems[product._id]
+                              : 9,
+                        },
                         (_, index) => (
-                          <option key={index} value={index + 1}>{index + 1}</option>
-                        )
+                          <option key={index} value={index + 1}>
+                            {index + 1}
+                          </option>
+                        ),
                       )}
                     </select>
                   </div>
                 </div>
               </div>
             </div>
-            <p className="text-center">{currency}{product.offerPrice * product.quantity}</p>
-            <button onClick={() => RemoveFromCart(product._id)} className="cursor-pointer mx-auto">
-              <img className="inline-block w-6 h-6" src={assets.remove_icon} alt="Remove" />
+            <p className="text-center">
+              {currency}
+              {product.offerPrice * product.quantity}
+            </p>
+            <button
+              onClick={() => RemoveFromCart(product._id)}
+              className="cursor-pointer mx-auto"
+            >
+              <img
+                className="inline-block w-6 h-6"
+                src={assets.remove_icon}
+                alt="Remove"
+              />
             </button>
           </div>
         ))}
 
         <button
-          onClick={() => { navigate("/Products"); window.scrollTo(0, 0); }}
+          onClick={() => {
+            navigate("/Products");
+            window.scrollTo(0, 0);
+          }}
           className="group cursor-pointer flex items-center mt-8 gap-2 text-primary font-medium"
         >
           <img src={assets.arrow_right_icon_colored} alt="" />
@@ -129,11 +215,15 @@ const Cart = () => {
               <div className="absolute top-12 py-1 bg-white border border-gray-300 text-sm w-full z-10">
                 {Addresses.map((address, index) => (
                   <p
-                    onClick={() => { setShowAddress(false); setSelectedAddress(address); }}
+                    onClick={() => {
+                      setShowAddress(false);
+                      setSelectedAddress(address);
+                    }}
                     key={index}
                     className="text-gray-500 p-2 hover:bg-gray-100 cursor-pointer"
                   >
-                    {address.street}, {address.city}, {address.state}, {address.country}
+                    {address.street}, {address.city}, {address.state},{" "}
+                    {address.country}
                   </p>
                 ))}
                 <p
@@ -161,20 +251,26 @@ const Cart = () => {
         <div className="text-gray-500 mt-4 space-y-2">
           <div className="flex justify-between">
             <span>Price</span>
-            <span>{currency}{getCartAmount()}</span>
+            <span>
+              {currency}
+              {getCartAmount()}
+            </span>
           </div>
           <div className="flex justify-between">
             <span>Shipping Fee</span>
-            <span className="text-primary">Free</span>
+            <span className="text-primary"> 2% </span>
           </div>
           <div className="flex justify-between text-lg font-bold mt-3 text-black">
             <span>Total Amount:</span>
-            <span>{currency}{getCartAmount() + (getCartAmount() * 0.02)}</span>
+            <span>
+              {currency}
+              {getCartAmount() + getCartAmount() * 0.02}
+            </span>
           </div>
         </div>
 
         {/* Using your custom primary and primary-dull classes here */}
-        <button 
+        <button
           onClick={() => placeOrder()}
           className="w-full py-3 mt-6 cursor-pointer bg-primary text-white font-medium hover:bg-primary-dull transition shadow-sm active:scale-[0.98]"
         >
