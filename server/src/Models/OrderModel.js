@@ -1,6 +1,6 @@
 const mongoose = require("mongoose")
-
-
+const Product = require("../Models/ProductModel");
+const Address = require('../Models/AddressModel')
 const orderSchema = new mongoose.Schema({
    userId : {type : String , required: true , ref:"user"},
    items: [{
@@ -10,7 +10,7 @@ const orderSchema = new mongoose.Schema({
     amount : {type : Number , required: true},
     address:{type : String , required : true , ref:"Address"},
     status:{type:String , default : "Order Placed"},
-    PaymentType:{type:String , default : "Order Placed"},
+    paymentType:{type:String , default : "COD"},
     isPaid : {type : Boolean , required : true , default : false}
 },{timestamps:true})
 

@@ -7,7 +7,7 @@ const { placeOrderCOD, getUserOrders, getAllOrders } = require("../Controllers/O
 const OrderRouter = express.Router();
 
 OrderRouter.post('/cod' , authUser , placeOrderCOD)
-OrderRouter.get('/user' , getUserOrders)
+OrderRouter.get('/user' , authUser, getUserOrders)
 OrderRouter.get('/seller' , getAllOrders)
 
 

@@ -45,7 +45,6 @@ const placeOrderCOD = async (req, res) => {
       message: "New Order Created",
       order: newOrder,
     });
-
   } catch (err) {
     console.log("error in placing order through COD", err);
     return res.status(500).json({
@@ -55,11 +54,11 @@ const placeOrderCOD = async (req, res) => {
   }
 };
 
-
 // /api/order/user
 const getUserOrders = async (req, res) => {
   try {
     const userId = req.userId;
+    console.log(userId);
 
     if (!userId) {
       return res.status(401).json({
@@ -74,13 +73,12 @@ const getUserOrders = async (req, res) => {
     })
       .populate("items.product address")
       .sort({ createdAt: -1 });
-
+    console.log(orders);
     return res.status(200).json({
       success: true,
       message: "User Orders Fetched",
       orders,
     });
-
   } catch (err) {
     console.log("error in getting order data", err);
     return res.status(500).json({
@@ -89,7 +87,6 @@ const getUserOrders = async (req, res) => {
     });
   }
 };
-
 
 // /api/order/seller
 const getAllOrders = async (req, res) => {
@@ -100,12 +97,12 @@ const getAllOrders = async (req, res) => {
       .populate("items.product address")
       .sort({ createdAt: -1 });
 
+    console.log(orders);
     return res.status(200).json({
       success: true,
       message: "All Orders Fetched",
       orders,
     });
-
   } catch (err) {
     console.log("error in getting all orders", err);
     return res.status(500).json({

@@ -10,6 +10,7 @@ const Orders = () => {
   const fetchMyorders = async () => {
     try {
       const { data } = await axios.get("http://localhost:3000/api/order/user");
+      console.log(data)
       if (data.success) {
         toast.success(data.message);
         setMyorders(data.orders);

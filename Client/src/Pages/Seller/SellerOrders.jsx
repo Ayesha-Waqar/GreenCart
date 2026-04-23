@@ -1,13 +1,28 @@
 import React, { useEffect, useState } from "react";
 import { useAppContext } from "../../Context/AppContext";
 import { assets, dummyOrders } from "../../assets/assets";
+import toast from "react-hot-toast";
 
 const SellerOrders = () => {
-  const { currency } = useAppContext();
+  const { currency, axios, navigate } = useAppContext();
   const [orders, setOrders] = useState([]);
 
-  const fetchOrders = () => {
-    setOrders(dummyOrders);
+  const fetchOrders = async () => {
+    try {
+      const { data } = await axios.get(
+        "http://localhost:3000/api/order/seller",
+      );
+      console.log("  alll orderss  ", data);
+      if (data.success) {
+        toast.success(data.message);
+        setOrders(data.orders);
+        // navigate('/Orders')
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      toast.error(error.message);
+    }
   };
 
   useEffect(() => {
@@ -24,13 +39,14 @@ const SellerOrders = () => {
             key={index}
             className="grid grid-cols-1 md:grid-cols-[0.5fr_2fr_2fr_1fr_1fr] items-start md:items-center gap-4 p-4 sm:p-6 bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow"
           >
-            {/* Icon Section */}
             <div className="hidden md:flex justify-center">
-              <img
-                className="w-10 h-10 object-contain p-2 bg-gray-100 rounded-full"
-                src={assets.box_icon}
-                alt="boxIcon"
-              />
+              <div className="w-14 h-14 rounded-xl bg-gray-50 border border-gray-200 shadow-sm overflow-hidden flex items-center justify-center hover:scale-105 transition-transform duration-200">
+                <img
+                  className="w-full h-full object-cover"
+                  src={order.items?.[0]?.product?.image?.[0] || assets.box_icon}
+                  alt="product"
+                />
+              </div>
             </div>
 
             {/* Items Section */}
@@ -42,7 +58,7 @@ const SellerOrders = () => {
                 </p>
               ))}
               <p className="text-xs text-gray-500 mt-2">
-                {new Date(order.createAt).toLocaleDateString(undefined, {
+                {new Date(order.createdAt).toLocaleDateString(undefined, {
                   dateStyle: "medium",
                 })}
               </p>

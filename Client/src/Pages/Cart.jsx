@@ -34,6 +34,7 @@ const Cart = () => {
       }
     }
     setCartArray(tempArr);
+    console.log("carttt arrayyyy" , cartArray )
   };
 
   //fetch user address
@@ -69,10 +70,10 @@ const Cart = () => {
         return toast.error("No address found");
       }
 
-      //Place order with COd
+      //Place order with COD
       if (paymentOption === "COD") {
         const { data } = await axios.post(
-          "http://localhost:3000/api/order/cod",
+          "http://localhost:3000/api/order/COD",
           {
             // userId: user._id,
             items: cartArray.map((item) => ({
@@ -82,6 +83,7 @@ const Cart = () => {
             address: selectedAddress._id,
           },
         );
+        console.log( " order placedd  " , data)
         if (data.success) {
           toast.success(data.message)
           setCartItems({})
