@@ -12,7 +12,7 @@ const { stripeWebHook } = require("./Controllers/OrderController");
 const app = express();
 
 const allowedOrigins = ["http://localhost:5173"];
-app.post('/stripe' , express.raw({type : "application/jon"}), stripeWebHook)
+app.post('/stripe' , express.raw({type : "application/json"}), stripeWebHook)
 
 app.use(express.json());
 app.use(cookieParser());
