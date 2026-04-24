@@ -524,7 +524,10 @@ const stripeWebHook = async (req, res) => {
     return res.status(400).send(`Webhook Error`);
   }
   console.log("33333333333333333333333333")
-console.log(event.type)
+// console.log(event.type)
+console.log("WEBHOOK HIT");
+console.log("EVENT:", event.type);
+console.log("METADATA:", event.data.object.metadata);
 
   // ✅ FIXED EVENT
   if (event.type === "checkout.session.completed") {
