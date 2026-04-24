@@ -11,7 +11,7 @@ const { stripeWebHook } = require("./Controllers/OrderController");
 
 const app = express();
 
-const allowedOrigins = ["http://localhost:5173"];
+const allowedOrigins = ["http://localhost:5173" , "https://green-cart-three-roan.vercel.app"];
 app.post('/stripe' , express.raw({type : "application/json"}), stripeWebHook)
 
 app.use(express.json());
