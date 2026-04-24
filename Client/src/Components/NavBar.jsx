@@ -1,12 +1,12 @@
-import React from "react";
-import { useEffect } from "react";
-import { NavLink } from "react-router";
+import React, { useEffect, useState } from "react";
+import { NavLink } from "react-router-dom";
 import { assets } from "../assets/assets";
 import { useAppContext } from "../Context/AppContext";
 import toast from "react-hot-toast";
 
 const NavBar = () => {
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = useState(false);
+
   const {
     user,
     setUser,
@@ -15,23 +15,23 @@ const NavBar = () => {
     searchQuery,
     setSearchQuery,
     totalCardItems,
-    axios
+    axios,
   } = useAppContext();
 
-  const logout = async() => {
+  const logout = async () => {
     try {
-      const { data } = await axios.get("http://localhost:3000/api/user/logout" , {withCredentials:true});
-      console.log(data);
-      if (data.success) {
-      toast.dismiss(); 
-      toast.success(data.message);
-        setUser(null)
-        navigate('/')
-      }
-      else{
-         toast.error(data.message);
-      }
+      const { data } = await axios.get(
+        "http://localhost:3000/api/user/logout",
+        { withCredentials: true }
+      );
 
+      if (data.success) {
+        toast.success(data.message);
+        setUser(null);
+        navigate("/");
+      } else {
+        toast.error(data.message);
+      }
     } catch (error) {
       toast.error(error.message);
     }
@@ -44,34 +44,34 @@ const NavBar = () => {
   }, [searchQuery]);
 
   return (
-    <nav className="flex items-center justify-between px-6 md:px-16 lg:px-24 xl:px-32 py-4 border-b border-gray-300 bg-white relative transition-all">
+    <nav className="fixed top-0 left-0 w-full z-50 flex items-center justify-between px-6 md:px-16 lg:px-24 xl:px-32 py-4 border-b border-gray-300 bg-white transition-all">
+      
+      {/* Logo */}
       <NavLink to="/" onClick={() => setOpen(false)}>
-        <img src={assets.logo} alt="" />
+        <img src={assets.logo} alt="logo" />
       </NavLink>
 
       {/* Desktop Menu */}
       <div className="hidden sm:flex items-center gap-8">
         <NavLink to="/">Home</NavLink>
-        <NavLink to="/Products">All products</NavLink>
-        <NavLink to="/Contact">Contact</NavLink>
-        <NavLink to="/Orders">My Orders</NavLink>
+        <NavLink to="/products">All products</NavLink>
+        <NavLink to="/contact">Contact</NavLink>
+        <NavLink to="/orders">My Orders</NavLink>
 
+        {/* Search */}
         <div className="hidden lg:flex items-center text-sm gap-2 border border-gray-300 px-3 rounded-full">
           <input
-            onChange={(e) => {
-              setSearchQuery(e.target.value);
-            }}
+            onChange={(e) => setSearchQuery(e.target.value)}
             className="py-1.5 w-full bg-transparent outline-none placeholder-gray-500"
             type="text"
             placeholder="Search products"
           />
-          <img src={assets.search_icon} className="w-4 h-4" />
+          <img src={assets.search_icon} className="w-4 h-4" alt="search" />
         </div>
 
+        {/* Cart */}
         <div
-          onClick={() => {
-            navigate("/Cart");
-          }}
+          onClick={() => navigate("/cart")}
           className="relative cursor-pointer"
         >
           <img src={assets.nav_cart_icon} className="w-6 opacity-80" />
@@ -80,10 +80,11 @@ const NavBar = () => {
           </button>
         </div>
 
+        {/* Auth */}
         {!user ? (
           <button
             onClick={() => setShowLogin(true)}
-            className="cursor-pointer px-8 py-2 bg-primary hover:bg-primary-dull transition text-white rounded-full"
+            className="px-8 py-2 bg-primary hover:bg-primary-dull transition text-white rounded-full"
           >
             Login
           </button>
@@ -98,8 +99,8 @@ const NavBar = () => {
             <div className="absolute right-0 top-full w-40 bg-white border border-gray-200 rounded-lg shadow-lg hidden group-hover:block z-50">
               <ul className="py-2 text-sm text-gray-800">
                 <li
-                  onClick={() => navigate("Orders")}
-                  className="px-4 py-2 hover:bg-primary/10 cursor-pointer "
+                  onClick={() => navigate("/orders")}
+                  className="px-4 py-2 hover:bg-primary/10 cursor-pointer"
                 >
                   My Orders
                 </li>
@@ -115,11 +116,10 @@ const NavBar = () => {
         )}
       </div>
 
+      {/* Mobile Right Side */}
       <div className="flex items-center gap-6 sm:hidden">
         <div
-          onClick={() => {
-            navigate("/Cart");
-          }}
+          onClick={() => navigate("/cart")}
           className="relative cursor-pointer"
         >
           <img src={assets.nav_cart_icon} className="w-6 opacity-80" />
@@ -127,32 +127,32 @@ const NavBar = () => {
             {totalCardItems()}
           </button>
         </div>
-        <button
-          onClick={() => (open ? setOpen(false) : setOpen(true))}
-          aria-label="Menu"
-          className="sm:hidden"
-        >
-          <img src={assets.menu_icon} />
+
+        <button onClick={() => setOpen(!open)}>
+          <img src={assets.menu_icon} alt="menu" />
         </button>
       </div>
 
       {/* Mobile Menu */}
-
       <div
-        className={`${open ? "flex" : "hidden"} absolute top-15 left-0 w-full bg-white shadow-md py-4 flex-col items-start gap-2 px-5 text-sm md:hidden`}
+        className={`${
+          open ? "flex" : "hidden"
+        } absolute top-full left-0 w-full bg-white shadow-md py-4 flex-col items-start gap-3 px-5 text-sm sm:hidden`}
       >
         <NavLink to="/" onClick={() => setOpen(false)}>
           Home
         </NavLink>
-        <NavLink to="/Products" onClick={() => setOpen(false)}>
+        <NavLink to="/products" onClick={() => setOpen(false)}>
           All products
         </NavLink>
+
         {user && (
-          <NavLink to="/Products" onClick={() => setOpen(false)}>
+          <NavLink to="/orders" onClick={() => setOpen(false)}>
             My Orders
           </NavLink>
         )}
-        <NavLink to="/Contact" onClick={() => setOpen(false)}>
+
+        <NavLink to="/contact" onClick={() => setOpen(false)}>
           Contact
         </NavLink>
 
@@ -162,14 +162,14 @@ const NavBar = () => {
               setOpen(false);
               setShowLogin(true);
             }}
-            className="cursor-pointer px-6 py-2 mt-2 bg-primary hover:bg-primary-dull transition text-white rounded-full text-sm"
+            className="px-6 py-2 mt-2 bg-primary text-white rounded-full"
           >
             Login
           </button>
         ) : (
           <button
             onClick={logout}
-            className="cursor-pointer px-6 py-2 mt-2 bg-primary hover:bg-primary-dull transition text-white rounded-full text-sm"
+            className="px-6 py-2 mt-2 bg-primary text-white rounded-full"
           >
             Logout
           </button>
