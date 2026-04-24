@@ -512,7 +512,7 @@ const stripeWebHook = async (req, res) => {
   const sig = req.headers["stripe-signature"];
 
   let event;
-
+  
   try {
     event = stripeInstance.webhooks.constructEvent(
       req.body,
@@ -523,6 +523,8 @@ const stripeWebHook = async (req, res) => {
     console.log("Webhook Error:", err.message);
     return res.status(400).send(`Webhook Error`);
   }
+  console.log("33333333333333333333333333")
+console.log(event.type)
 
   // ✅ FIXED EVENT
   if (event.type === "checkout.session.completed") {
@@ -540,6 +542,8 @@ const stripeWebHook = async (req, res) => {
 
   res.status(200).json({ received: true });
 };
+
+
 
 // ================= USER ORDERS =================
 const getUserOrders = async (req, res) => {
