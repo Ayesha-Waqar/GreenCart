@@ -1,27 +1,29 @@
-import React from 'react'
-import { useAppContext } from '../Context/AppContext'
-import { useLocation } from 'react-router'
-import { useEffect } from 'react'
+import React, { useEffect } from "react";
+import { useAppContext } from "../Context/AppContext";
+import { useLocation } from "react-router";
 
 const Loading = () => {
-    const {navigate} = useAppContext()
-    let {search} = useLocation()
-    const query = new URLSearchParams(search)
-    const nextUrl = query.get('next');
+  const { navigate } = useAppContext();
+  const { search } = useLocation();
 
-    useEffect(()=>{
-        if(nextUrl){
-            setTimeout(()=>{
-                navigate(`${nextUrl}`)
-            },5000)
-        }
-    },[nextUrl])
+  const query = new URLSearchParams(search);
+  const success = query.get("success");
+
+  useEffect(() => {
+    if (success === "true") {
+      setTimeout(() => {
+        navigate("/orders");
+      }, 2000);
+    } else {
+      navigate("/cart");
+    }
+  }, [success]);
 
   return (
-   <div class="flex items-center justify-center h-screen">
-  <div class="w-12 h-12 border-4 border-gray-300 border-t-green-500 rounded-full animate-spin"></div>
-</div>
-  )
-}
+    <div className="flex items-center justify-center h-screen">
+      <div className="w-12 h-12 border-4 border-gray-300 border-t-green-500 rounded-full animate-spin"></div>
+    </div>
+  );
+};
 
-export default Loading
+export default Loading;
