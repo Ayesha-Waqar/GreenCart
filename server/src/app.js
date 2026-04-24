@@ -7,10 +7,12 @@ const ProductRouter = require("./Routes/ProductRoutes");
 const cartRouter = require("./Routes/CartRouter");
 const addressRouter = require("./Routes/AddressRoute");
 const OrderRouter = require("./Routes/OrderRoute");
+const { stripeWebHook } = require("./Controllers/OrderController");
 
 const app = express();
 
 const allowedOrigins = ["http://localhost:5173"];
+app.post('/stripe' , express.raw({type : "application/jon"}), stripeWebHook)
 
 app.use(express.json());
 app.use(cookieParser());

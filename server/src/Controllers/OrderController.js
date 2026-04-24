@@ -304,7 +304,6 @@ const stripeWebHook = async(req, res)=>{
 }
 
 
-
 // /api/order/user
 const getUserOrders = async (req, res) => {
   try {
@@ -368,4 +367,5 @@ module.exports = {
   getUserOrders,
   getAllOrders,
   placeOrderStripe,
+  stripeWebHook
 };
