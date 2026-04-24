@@ -17,6 +17,7 @@ import AllProducts from "./Pages/Seller/AddProducts";
 import SellerOrders from "./Pages/Seller/SellerOrders";
 import AddProducts from "./Pages/Seller/AddProducts";
 import ProductList from "./Pages/Seller/ProductList";
+import Loading from "./Components/Loading";
 
 const App = () => {
   const { showLogin, isSeller } = useAppContext();
@@ -37,6 +38,8 @@ const App = () => {
           <Route path="/Cart" element={<Cart />} />
           <Route path="/AddAddress" element={<AddAddress />} />
           <Route path="/Orders" element={<Orders />} />
+          <Route path="/Loader" element={<Loading />} />
+
           <Route
             path="/seller"
             element={isSeller ? <SellerLayout /> : <SellerLogin />}
@@ -54,3 +57,4 @@ const App = () => {
 };
 
 export default App;
+  

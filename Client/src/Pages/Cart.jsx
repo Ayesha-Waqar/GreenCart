@@ -92,6 +92,28 @@ const Cart = () => {
           toast.error(data.message);
         }
       }
+
+      // online payment 
+      else{
+        const { data } = await axios.post(
+          "http://localhost:3000/api/order/online",
+          {
+            items: cartArray.map((item) => ({
+              product: item._id,
+              quantity: item.quantity, 
+            })),
+            address: selectedAddress._id,
+          },
+        );
+        console.log( " order placedd  " , data)
+        if (data.success) {
+          toast.success(data.message)
+        window.location.replace(data.url)
+        } else {
+          toast.error(data.message);
+        }
+
+      }
     } catch (error) {
       toast.error(error.message);
     }
