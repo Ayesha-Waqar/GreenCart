@@ -131,6 +131,7 @@ const stripeWebHook = async (req, res) => {
 
   let event;
 
+
   try {
     event = stripeInstance.webhooks.constructEvent(
       req.body,
@@ -138,10 +139,10 @@ const stripeWebHook = async (req, res) => {
       process.env.STRIPE_WEBHOOK_SECRET
     );
   } catch (err) {
-    console.log("Webhook Error:", err.message);
-    return res.status(400).send(`Webhook Error`);
+    console.error("Webhook Error:", err.message);
+    return res.status(400).send(`Webhook Error: ${err.message}`);
   }
-
+  console.log("Webhook Event:", event.type);
 
   switch (event.type) {
     case "payment_intent.succeeded":
