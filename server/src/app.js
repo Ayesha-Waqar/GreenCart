@@ -12,7 +12,7 @@ const { stripeWebHook } = require("./Controllers/OrderController");
 const app = express();
 
 //allowed origins for CORS
-const allowedOrigins = ["http://localhost:5173"];
+const allowedOrigins = ["http://localhost:5173" , "https://green-cart-seven-rouge.vercel.app/"];
 
 app.post('/stripe' , express.raw({type : "application/json"}), stripeWebHook)
 
