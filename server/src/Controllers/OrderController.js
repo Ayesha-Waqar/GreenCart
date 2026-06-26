@@ -129,9 +129,10 @@ const stripeWebHook = async (req, res) => {
   const stripeInstance = new stripe(process.env.STRIPE_SECRET_KEY);
   const sig = req.headers["stripe-signature"];
 
+  console.log("Is Buffer:", Buffer.isBuffer(req.body));
+  console.log("Type:", typeof req.body);
+  console.log("Stripe Signature:", req.headers["stripe-signature"]);
   let event;
-
-
   try {
     event = stripeInstance.webhooks.constructEvent(
       req.body,
