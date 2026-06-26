@@ -29,17 +29,10 @@ const AddProducts = () => {
         formData.append("images", files[i]);
       }
       const { data } = await axios.post(
-        "http://localhost:3000/api/product/addProduct",
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        },
-      );
-      console.log(data);
+        "/api/product/addProduct",
+        formData);
       if (data.success) {
-         toast.dismiss(); 
+        toast.dismiss(); 
         toast.success(data.message);
         setName("");
         setDescription("");
@@ -51,7 +44,7 @@ const AddProducts = () => {
         console.log("error in data ");
       }
     } catch (error) {
-      toast.error(error.message);
+      toast.error(error.response?.data?.message || "Something went wrong");
     }
   };
   return (

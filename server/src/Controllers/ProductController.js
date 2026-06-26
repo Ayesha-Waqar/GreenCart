@@ -10,7 +10,7 @@ const addProduct = async (req, res) => {
       return res.status(400).json({
         success: false,
         message: "No images uploaded",
-      });
+      });  
     }
 
     const images = req.files;
@@ -40,7 +40,7 @@ const addProduct = async (req, res) => {
     console.log("Error adding product:", err);
     return res.status(500).json({
       success: false,
-      message: "Server error while adding product",
+      message: err.message,
     });
   }
 };
@@ -70,7 +70,7 @@ const productList = async (req, res) => {
 // GET SINGLE PRODUCT
 const productById = async (req, res) => {
   try {
-    const { id } = req.params;
+    const { id } = req.body;
 
     if (!id) {
       return res.status(400).json({
@@ -107,8 +107,7 @@ const productById = async (req, res) => {
 // UPDATE STOCK
 const changeStock = async (req, res) => {
   try {
-    const { id } = req.params;
-    const { inStock } = req.body;
+    const { id, inStock } = req.body;
 
     if (!id || inStock === undefined) {
       return res.status(400).json({
@@ -135,16 +134,15 @@ const changeStock = async (req, res) => {
       message: "Stock updated successfully",
       product: updatedProduct,
     });
-
   } catch (err) {
     console.log("Error updating stock:", err);
+
     return res.status(500).json({
       success: false,
-      message: "Server error while updating stock",
+      message: err.message,
     });
   }
 };
-
 
 // EXPORT
 module.exports = {

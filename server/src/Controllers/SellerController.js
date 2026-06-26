@@ -23,15 +23,15 @@ const login = async (req, res) => {
     }
 
     const token = jwt.sign(
-      { email, role: "seller" },
+      { email},
       process.env.JWT_SECRET_KEY,
       { expiresIn: "7d" }
     );
 
     res.cookie("token", token, {
       httpOnly: true,
-      secure: false, // dev me false rakho
-      sameSite: "lax", // strict issues avoid karega
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
@@ -57,6 +57,7 @@ const isAuth = async (req, res) => {
       success: true,
       message: "User Authorized",
     });
+    
   } catch (err) {
     console.log("cant auth user", err);
     return res.status(500).json({

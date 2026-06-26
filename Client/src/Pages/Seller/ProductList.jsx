@@ -4,25 +4,26 @@ import toast from "react-hot-toast";
 
 const ProductList = () => {
   const { products, currency, axios, fetchProducts } = useAppContext();
-      const toogleStock = async (id, inStock) => {
-        try {
-          const { data } = await axios.put(
-            `http://localhost:3000/api/product/changeStock/${id}`,
-            { inStock },
-          );
-          console.log(data)
 
-          if (data.success) {
-             toast.dismiss(); 
-            toast.success(data.message);
-            fetchProducts();
-          } else {
-            console.log("error in data");
-          }
-        } catch (error) {
-          toast.error(error.message);
-        }
-      };
+  const toogleStock = async (id, inStock) => {
+    try {
+      const { data } = await axios.post(
+        `/api/product/changeStock/${id}`,
+        { id, inStock },
+      );
+      // console.log(data)
+
+      if (data.success) {
+        toast.dismiss();
+        toast.success(data.message);
+        fetchProducts();
+      } else {
+        console.log("error in data");
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Something went wrong");
+    }
+  };
 
   return (
     <div className="flex-1 py-6 md:py-10 flex flex-col">

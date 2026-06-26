@@ -14,7 +14,8 @@ const authSeller = async (req, res, next) => {
 
     if (decoded.email === process.env.SELLER_EMAIL) {
       next();
-    } else {
+    }
+    else {
       return res.status(401).json({
         message: "Can't verify seller",
       });

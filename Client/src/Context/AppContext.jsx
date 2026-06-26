@@ -6,7 +6,7 @@ import toast from "react-hot-toast";
 import axios from "axios";
 
 axios.defaults.withCredentials = true;
-axios.defaults.baseURL = import.meta.env.BACKEND_URL;
+axios.defaults.baseURL = import.meta.env.VITE_BACKEND_URL;
 
 export const appContext = createContext();
 
@@ -18,15 +18,13 @@ export const AppContextProvider = ({ children }) => {
   const [showLogin, setShowLogin] = useState(false);
   const [products, setProducts] = useState([]);
   const [cartItems, setCartItems] = useState({});
-  const [searchQuery, setSearchQuery] = useState({});
+  const [searchQuery, setSearchQuery] = useState("");
   const [isCartLoaded, setIsCartLoaded] = useState(false);
 
   const fetchSeller = async () => {
     try {
       const { data } = await axios.get(
-        "http://localhost:3000/api/seller/isAuth",
-        { withCredentials: true },
-      );
+        "/api/seller/isAuth");
       console.log(data);
       if (data.success) {
         toast.dismiss();
@@ -36,70 +34,44 @@ export const AppContextProvider = ({ children }) => {
         setIsSeller(false);
       }
     } catch (error) {
-      toast.error(error.message);
+      // toast.error(error.response?.data?.message || "Something went wrong");
+      console.log(error.message);
+      setIsSeller(false);
     }
   };
 
-  // const fetchUser = async () => {
-  //   try {
-  //     const { data } = await axios.get(
-  //       "http://localhost:3000/api/user/isAuth",
-  //       { withCredentials: true },
-  //     );
-  //     console.log(data);
-  //     if (data.success) {
-  //       toast.dismiss();
-  //       toast.success(data.message);
-  //       setUser(data.user);
-  //       setCartItems(data.user.cartItems || {});
-  //     } else {
-  //       console.log("error in data ");
-  //       setUser(null);
-  //     }
-  //   } catch (error) {
-  //     toast.error(error.message);
-  //   }
-  // };
- 
- 
   const fetchUser = async () => {
-  try {
-    const { data } = await axios.get(
-      "http://localhost:3000/api/user/isAuth",
-      { withCredentials: true }
-    );
-    console.log("fetch userrrrr" , data)
-    if (data.success) {
-      setUser(data.user);
-            console.log(data.user)
-      setCartItems(data.user.cartItems || {}); // DB se cart load
-               console.log(cartItems)
-      setIsCartLoaded(true); // flag set karo
-    } else {
-      setUser(null);
-      setIsCartLoaded(true); // guest ke liye bhi set karo
+    try {
+      const { data } = await axios.get(
+        "/api/user/isAuth",
+      );
+      if (data.success) {
+        setUser(data.user);
+        setCartItems(data.user.cartItems); // DB se cart load
+        setIsCartLoaded(true); // flag set karo
+      } else {
+        setUser(null);
+        setIsCartLoaded(true); // guest ke liye bhi set karo
+      }
+    } catch (error) {
+      // toast.error(error.response?.data?.message || "Something went wrong");
+      setIsCartLoaded(true); // error pe bhi set karo..warna save kabhi nahi hoga
     }
-  } catch (error) {
-    toast.error(error.message);
-    setIsCartLoaded(true); // error pe bhi set karo..warna save kabhi nahi hoga
-  }
-};
+  };
 
   const fetchProducts = async () => {
     try {
       const { data } = await axios.get(
-        "http://localhost:3000/api/product/getProducts",
+        "/api/product/getProducts",
       );
       // console.log(data)
       if (data.success) {
-        toast.dismiss();
-        toast.success(data.message);
         setProducts(data.products);
       } else {
         console.log("errorrr in data success");
       }
     } catch (error) {
-      toast.error(error.message);
+      // toast.error(error.response?.data?.message || "Something went wrong");
     }
   };
 
@@ -161,45 +133,25 @@ export const AppContextProvider = ({ children }) => {
 
   // update cart items in db
   useEffect(() => {
-  if (!user) return;           // skip guest
-  if (!isCartLoaded) return;   //Wa8 to complete fetch
+    if (!user) return;           // skip guest
+    if (!isCartLoaded) return;   //Wa8 to complete fetch
 
-  const updateCart = async () => {
-    try {
-      const { data } = await axios.post(
-        "http://localhost:3000/api/cart/update",
-        { cartItems }
-      );
-      if (!data.success) {
-        toast.error(data.message);
+    const updateCart = async () => {
+      try {
+        const { data } = await axios.post(
+          "/api/cart/update",
+          { cartItems }
+        );
+        if (!data.success) {
+          toast.error(data.message);
+        }
+      } catch (error) {
+        toast.error(error.response?.data?.message || "Something went wrong");
       }
-    } catch (error) {
-      toast.error(error.response?.data?.message || error.message);
-    }
-  };
+    };
 
-  updateCart();
-}, [cartItems, isCartLoaded]); 
-
-// useEffect(() => {
-//   const getCartItems = async () => {
-//     try {
-//       const { data } = await axios.get("http://localhost:3000/api/cart/get");
-
-//       console.log("get cart ", data);
-
-//       if (data.success) {
-//         setCartItems(data.cartItems || {}); 
-//       } else {
-//         toast.error(data.message);
-//       }
-//     } catch (error) {
-//       toast.error(error.response?.data?.message || error.message);
-//     }
-//   };
-
-//   getCartItems(); 
-// }, []);
+    updateCart();
+  }, [cartItems, isCartLoaded]);
 
   const value = {
     navigate,
@@ -208,7 +160,7 @@ export const AppContextProvider = ({ children }) => {
     isSeller,
     setIsSeller,
     showLogin,
-    setShowLogin ,
+    setShowLogin,
     products,
     currency,
     cartItems,

@@ -10,7 +10,7 @@ const SellerOrders = () => {
   const fetchOrders = async () => {
     try {
       const { data } = await axios.get(
-        "http://localhost:3000/api/order/seller",
+        "/api/order/seller",
       );
       console.log("  alll orderss  ", data);
       if (data.success) {
@@ -21,7 +21,7 @@ const SellerOrders = () => {
         toast.error(data.message);
       }
     } catch (error) {
-      toast.error(error.message);
+      toast.error(error.response?.data?.message || "Something went wrong");
     }
   };
 

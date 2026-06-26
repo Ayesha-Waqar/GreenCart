@@ -15,20 +15,20 @@ const SellerLogin = () => {
   const formHandler = async(e) => {
    try{
     e.preventDefault();
-    const {data} = await axios.post('http://localhost:3000/api/seller/login', { email, password })
+    const {data} = await axios.post("/api/seller/login", { email, password })
     // console.log(data)
     if(data.success){
-       toast.dismiss(); 
       toast.success(data.message);
       setIsSeller(true)
       navigate('/seller')
     }
     else{
-     console.log("errorrr in data success")
+      toast.error(data.message);
     }
    }
    catch(error){
-     toast.error(error.message);
+      console.log(error.message);
+      toast.error(error.response?.data?.message || "Something went wrong");
    }
    
   };

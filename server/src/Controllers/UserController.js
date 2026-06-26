@@ -39,8 +39,8 @@ const registerUser = async (req, res) => {
 
     res.cookie("token", token, {
       httpOnly: true,
-      secure: false,
-      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
@@ -57,7 +57,7 @@ const registerUser = async (req, res) => {
     console.log("Error registering user:", err);
     return res.status(500).json({
       success: false,
-      message: "Server error",
+      message: err.message || "Server error",
     });
   }
 };
@@ -109,6 +109,10 @@ const loginUser = async (req, res) => {
     return res.status(200).json({
       success: true,
       message: "User logged in successfully",
+      user: {
+        name: existingUser.name,
+        email: existingUser.email,
+      },
     });
 
   } catch (err) {
@@ -126,23 +130,12 @@ const isAuth = async (req, res) => {
   try {
     const userId = req.userId;
 
-    const foundUser = await User.findById(userId);
-
-    if (!foundUser) {
-      return res.status(404).json({
-        success: false,
-        message: "User not found",
-      });
-    }
+    const user = await User.findById(userId).select("-password");
 
     return res.status(200).json({
       success: true,
       message: "User Authorized",
-      user: {
-        name: foundUser.name,
-        email: foundUser.email,
-        cartItems : foundUser.cartItems
-      },
+      user
     });
 
   } catch (err) {
@@ -158,10 +151,10 @@ const isAuth = async (req, res) => {
 // LOGOUT
 const logout = async (req, res) => {
   try {
-    res.clearCookie("token", {   
+    res.clearCookie("token", {
       httpOnly: true,
-      secure: false,
-      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
     });
 
     return res.status(200).json({

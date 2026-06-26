@@ -11,7 +11,9 @@ const { stripeWebHook } = require("./Controllers/OrderController");
 
 const app = express();
 
+//allowed origins for CORS
 const allowedOrigins = ["http://localhost:5173"];
+
 app.post('/stripe' , express.raw({type : "application/json"}), stripeWebHook)
 
 app.use(express.json());
@@ -21,6 +23,9 @@ app.use(cors({
     credentials: true,
 }));
 
+app.get("/", (req, res) => {
+  res.send("Welcome to GreenCart API");
+});
 app.use("/api/user" , userRouter)
 app.use("/api/seller" , sellerRouter)
 app.use('/api/product' ,ProductRouter)

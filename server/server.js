@@ -1,4 +1,5 @@
 require("dotenv").config();
+// console.log("MONGOOSE_URI:", process.env.MONGOOSE_URI);
 
 const app = require("./src/app");
 const connectDb = require("./src/Db/db");

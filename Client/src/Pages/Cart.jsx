@@ -40,7 +40,7 @@ const Cart = () => {
   //fetch user address
   const getAddress = async () => {
     try {
-      const { data } = await axios.get("http://localhost:3000/api/address/get");
+      const { data } = await axios.get("/api/address/get");
       // console.log("fetch address", data);
       if (data.success) {
         setAddresses(data.address);
@@ -53,7 +53,7 @@ const Cart = () => {
         setIsCartLoaded(true); // guest ke liye bhi set karo
       }
     } catch (error) {
-      toast.error(error.message);
+      // toast.error(error.response?.data?.message || "Something went wrong");
       setIsCartLoaded(true); // error pe bhi set karo..warna save kabhi nahi hoga
     }
   };
@@ -73,7 +73,7 @@ const Cart = () => {
       //Place order with COD
       if (paymentOption === "COD") {
         const { data } = await axios.post(
-          "http://localhost:3000/api/order/COD",
+          "/api/order/COD",
           {
             // userId: user._id,
             items: cartArray.map((item) => ({
@@ -96,7 +96,7 @@ const Cart = () => {
       // online payment 
       else{
         const { data } = await axios.post(
-          "http://localhost:3000/api/order/online",
+          "/api/order/online",
           {
             items: cartArray.map((item) => ({
               product: item._id,
@@ -115,7 +115,7 @@ const Cart = () => {
 
       }
     } catch (error) {
-      toast.error(error.message);
+      toast.error(error.response?.data?.message || "Something went wrong");
     }
   };
 
@@ -230,7 +230,9 @@ const Cart = () => {
                 : "No address found"}
             </p>
             <button
-              onClick={() => setShowAddress(!showAddress)}
+              onClick={() => {setShowAddress(!showAddress)
+                navigate("/AddAddress")
+              }}
               className="text-primary hover:underline cursor-pointer"
             >
               Change

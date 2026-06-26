@@ -15,25 +15,24 @@ const Login = () => {
   const isSellerPath = location.pathname.includes("seller");
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-
+  
     try {
+      e.preventDefault();
+
       const url =
         state === "login"
-          ? "http://localhost:3000/api/user/login"
-          : "http://localhost:3000/api/user/register";
+          ? "/api/user/login"
+          : "/api/user/register";
 
       const payload =
         state === "login"
           ? { email, password }
           : { name, email, password };
 
-      const { data } = await axios.post(url, payload, {
-        withCredentials: true,
-      });
+      const { data } = await axios.post(url, payload)
 
       if (data.success) {
-        toast.success(data.message);
+        // console.log(data.user);
         setUser(data.user);
         setShowLogin(false);
         navigate("/");
