@@ -128,10 +128,10 @@ const placeOrderStripe = async (req, res) => {
 const stripeWebHook = async (req, res) => {
   const stripeInstance = new stripe(process.env.STRIPE_SECRET_KEY);
   const sig = req.headers["stripe-signature"];
-
+  
   console.log("Is Buffer:", Buffer.isBuffer(req.body));
-  console.log("Type:", typeof req.body);
-  console.log("Stripe Signature:", req.headers["stripe-signature"]);
+  console.log("Constructor:", req.body?.constructor?.name);
+  console.log("Content-Type:", req.headers["content-type"]);
   let event;
   try {
     event = stripeInstance.webhooks.constructEvent(
