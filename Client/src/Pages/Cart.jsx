@@ -16,7 +16,8 @@ const Cart = () => {
     totalCardItems,
     axios,
     user,
-    setCartItems
+    setCartItems,
+   setIsCartLoaded,
   } = useAppContext();
 
   const [showAddress, setShowAddress] = useState(false);
